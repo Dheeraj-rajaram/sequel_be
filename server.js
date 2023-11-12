@@ -4,6 +4,9 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import cors from 'cors';
+import { sequelusers } from "./models/sequelusers.js";
+import { v4 as  uuidv4 } from 'uuid';
+
 dotenv.config()
 
 const app = express();
@@ -29,7 +32,14 @@ app.post('/signup', async (req, res) => {
 })
 
 app.get('/users', authenticate, (req, res) => {
-    return res.json({ step:"step3: get token from header in be", users, heredata: req.user, otherdata: 234 })
+    const mike = sequelusers.create({
+        id:  uuidv4(),
+        email: 'asdf',
+        password: '',
+      });
+
+    // return res.json({ step:"step3: get token from header in be", users, heredata: req.user, otherdata: 234 })
+    return res.json({ mike })
 })
 
 app.post('/login', async (req, res) => {
