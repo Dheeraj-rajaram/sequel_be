@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import cors from 'cors';
 import { sequelusers } from "./models/sequelusers.js";
 import { v4 as uuidv4 } from 'uuid';
+import { transporter } from "./email.js";
 
 dotenv.config()
 
@@ -38,11 +39,6 @@ app.post('/signup', async (req, res) => {
     }
 })
 
-app.get('/users', authenticate, (req, res) => {
-    // return res.json({ step:"step3: get token from header in be", users, heredata: req.user, otherdata: 234 })
-    return res.json({ mike })
-})
-
 app.post('/login', async (req, res) => {
     const user = await sequelusers.findOne({
         where: {
@@ -54,11 +50,8 @@ app.post('/login', async (req, res) => {
     }
     try {
         if (await bcrypt.compare(req.body.password, user.password)) {
-            //jwt
-            let accessToken = generateAccessToken({ email: user.email });
-            let refreshToken = jwt.sign({ email: user.email }, process.env.REFRESH_TOKEN_SECRET);
-            refreshTokens.push(refreshToken);
-            res.json({ accessToken, refreshToken });
+            let accessToken = jwt.sign({ email: user.email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '20s' });
+            res.json({ accessToken });
         } else {
             res.status(500).send("user authentication failed");
         }
@@ -84,31 +77,54 @@ app.post('/verify', (req, res) => {
     });
 })
 
-
-let refreshTokens = [];
-
-app.delete('/logout', (req, res) => {
-    refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
-    return res.sendStatus(204)
-})
-
-app.post('/refresh-token', (req, res) => {
-    const refreshToken = req.body.token;
-    if (refreshToken == null) {
-        return res.sendStatus(401)
-    }
-    if (!refreshTokens.includes(refreshToken)) {
-        return res.sendStatus(403)
-    }
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (error, user) => {
-        if (error) {
-            return res.sendStatus(403)
+app.post('/forgot-password', async (req, res) => {
+    const user = await sequelusers.findOne({
+        where: {
+            email: req.body.email
         }
-        let accessToken = generateAccessToken({ name: user.name, password: user.password });
-        res.json(accessToken)
+    });
+    if (!user) {
+        return res.status(400).send("cannot find user");
+    }
+    const token = jwt.sign({ email: user.email }, process.env.ACCESS_TOKEN_SECRET);
+    const details = {
+        from: "no-reply<lockedandloaded99@gmail.com>",
+        to: req.body.email,
+        subject: "reset password",
+        text: `Reset your password with this link ${process.env.BASE_URL}/reset-password?token=${token}`
+    }
+    transporter.sendMail(details, (error) => {
+        if (error) {
+            console.log(error)
+        }
+        else { console.log("email sent") }
     })
+    return res.json({ email: req.body.email })
 })
 
+app.post('/reset-password', async (req, res) => {
+    // decrypt token
+    const decodedToken = jwt.decode(req.body.token, {
+        complete: true
+       });
+    // check if email is present in db
+    const user = await sequelusers.findOne({
+        where: {
+            email: decodedToken.payload.email
+        }
+    });
+    if (!user) {
+        return res.status(400).send("cannot find user");
+    }
+    // encrypt password
+    const newPassword = await bcrypt.hash(req.body.password, 10);
+    // update password for the email
+    await sequelusers.update({ password: newPassword }, {
+        where: {
+            email: decodedToken.payload.email
+        }
+      });
+})
 
 function authenticate(req, res, next) {
     const authHeader = req.headers['authorization'];
@@ -125,10 +141,6 @@ function authenticate(req, res, next) {
         req.user = user;
         next();
     });
-}
-
-function generateAccessToken(user) {
-    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '20s' });
 }
 
 app.listen(3002)
