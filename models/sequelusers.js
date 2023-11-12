@@ -11,15 +11,21 @@ export const sequelusers = sq.define('sequelusers', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    password: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
     firstname: {
         type: DataTypes.STRING
     },
     lastname: {
         type: DataTypes.STRING
+    },
+    dob: {
+        type: DataTypes.STRING
+    },
+    phonenumber: {
+        type: DataTypes.STRING
+    },
+    password: {
+        type: DataTypes.STRING,
+        allowNull: false
     },
 
 })
