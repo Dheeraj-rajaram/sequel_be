@@ -1,0 +1,17 @@
+version: '3'
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: testDb
+    ports:
+      - "5432:5432"
+
+  node:
+    build: .
+    ports:
+      - "3002:3002"
+    depends_on:
+      - postgres
