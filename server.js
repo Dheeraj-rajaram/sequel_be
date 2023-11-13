@@ -149,7 +149,6 @@ return res.json({user});
 
 
 
-
 function authenticate(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
