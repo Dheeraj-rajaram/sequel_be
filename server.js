@@ -50,7 +50,7 @@ app.post('/login', async (req, res) => {
     }
     try {
         if (await bcrypt.compare(req.body.password, user.password)) {
-            let accessToken = jwt.sign({ email: user.email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '20s' });
+            let accessToken = jwt.sign({ email: user.email }, process.env.ACCESS_TOKEN_SECRET);
             res.json({ accessToken });
         } else {
             res.status(500).send("user authentication failed");
@@ -91,7 +91,7 @@ app.post('/forgot-password', async (req, res) => {
         from: "no-reply<lockedandloaded99@gmail.com>",
         to: req.body.email,
         subject: "reset password",
-        text: `Reset your password with this link ${process.env.BASE_URL}/reset-password?token=${token}`
+        text: `Reset your password with this link ${process.env.BASE_URL}/reset-password?token=${token}&firstname=${user.firstname}&lastname=${user.lastname}`
     }
     transporter.sendMail(details, (error) => {
         if (error) {
@@ -103,11 +103,9 @@ app.post('/forgot-password', async (req, res) => {
 })
 
 app.post('/reset-password', async (req, res) => {
-    // decrypt token
     const decodedToken = jwt.decode(req.body.token, {
         complete: true
-       });
-    // check if email is present in db
+    });
     const user = await sequelusers.findOne({
         where: {
             email: decodedToken.payload.email
@@ -116,15 +114,41 @@ app.post('/reset-password', async (req, res) => {
     if (!user) {
         return res.status(400).send("cannot find user");
     }
-    // encrypt password
     const newPassword = await bcrypt.hash(req.body.password, 10);
-    // update password for the email
     await sequelusers.update({ password: newPassword }, {
         where: {
             email: decodedToken.payload.email
         }
-      });
+    });
+    return res.send("email sent");
 })
+
+app.post('/save-stepone', async (req, res) => {
+        await sequelusers.update({
+            aedBattery: req.body.IsAedBatteryChecked,
+            twistedSystem: req.body.IsTwistedSystemChecked,
+            infustion: req.body.IsInfusionChecked,
+            incertion: req.body.IsIncertionChecked,
+            step: req.body.step
+        }, {
+            where: {
+                email: req.body.email
+            }
+        });
+    return res.send("user updated");
+})
+
+app.post('/get-stepdata', async (req, res) => {
+    const user = await sequelusers.findOne({
+        where: {
+            email: req.body.email
+        }
+    });
+return res.json({user});
+})
+
+
+
 
 function authenticate(req, res, next) {
     const authHeader = req.headers['authorization'];

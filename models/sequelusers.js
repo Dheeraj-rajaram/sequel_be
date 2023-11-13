@@ -27,6 +27,21 @@ export const sequelusers = sq.define('sequelusers', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    aedBattery: {
+        type: DataTypes.STRING
+    },
+    twistedSystem: {
+        type: DataTypes.STRING
+    },
+    infustion: {
+        type: DataTypes.STRING
+    },
+    incertion: {
+        type: DataTypes.STRING
+    },
+    step: {
+        type: DataTypes.STRING
+    },
 
 })
 
