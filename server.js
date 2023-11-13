@@ -174,4 +174,4 @@ function authenticate(req, res, next) {
     });
 }
 
-app.listen(3002)
+app.listen(process.env.PORT)
