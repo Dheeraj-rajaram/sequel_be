@@ -21,6 +21,14 @@ app.use(bodyParser.json())
 
 app.post('/signup', async (req, res) => {
     try {
+        const existingUser = await sequelusers.findOne({
+            where: {
+                email: req.body.email
+            }
+        });
+        if (existingUser) {
+            return res.json({isDuplicate: true});
+        }
         const password = await bcrypt.hash(req.body.password, 10);
         const user = { email: req.body.email, password };
         const result = sequelusers.create({
@@ -120,7 +128,7 @@ app.post('/reset-password', async (req, res) => {
             email: decodedToken.payload.email
         }
     });
-    return res.send("email sent");
+    return res.send("password reset");
 })
 
 app.post('/save-stepone', async (req, res) => {
