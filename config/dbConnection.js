@@ -1,7 +1,9 @@
 import { Sequelize } from "sequelize";
+import dotenv from "dotenv";
+dotenv.config();
 
-export const sq = new Sequelize('testDb', 'postgres', 'root', {
-    host: 'localhost',
+export const sq = new Sequelize(process.env.DB_NAME, process.env.DB_USERNAME, process.env.DB_PASSWORD, {
+    host: process.env.DB_HOST,
     dialect: 'postgres'
 });
 
