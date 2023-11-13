@@ -9,3 +9,13 @@ export const transporter = nodemailer.createTransport({
         pass: process.env.MAILER_AUTH_USER_PASSWORD
     }
 });
+
+// const transporter = nodemailer.createTransport({
+//     host: 'smtp.example.com',
+//     port: 587,
+//     secure: false,
+//     auth: {
+//       user: 'your_username',
+//       pass: 'your_password',
+//     },
+//   });
