@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sq } from "../config/dbConnection.js";
 
-export const sequelusers = sq.define('sequelusers', {
+export const sequelusers = sq.define('patients', {
     id: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -27,22 +27,30 @@ export const sequelusers = sq.define('sequelusers', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    aedBattery: {
+    IsUserGuideChecked: {
         type: DataTypes.STRING
     },
-    twistedSystem: {
+    IsInsulinPumpWithCoverChecked: {
         type: DataTypes.STRING
     },
-    infustion: {
+    IsUsebCableChecked: {
         type: DataTypes.STRING
     },
-    incertion: {
+    IsWalladapterChecked: {
+        type: DataTypes.STRING
+    },
+    IsPumpchargerChecked: {
+        type: DataTypes.STRING
+    },
+    IsRechargableBatteryChecked: {
+        type: DataTypes.STRING
+    },
+    IsPumpclipChecked: {
         type: DataTypes.STRING
     },
     step: {
         type: DataTypes.STRING
     },
-
 })
 
 sequelusers.sync({ alter: true }).then(() => {

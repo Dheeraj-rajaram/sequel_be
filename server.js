@@ -133,10 +133,13 @@ app.post('/reset-password', async (req, res) => {
 
 app.post('/save-stepone', async (req, res) => {
         await sequelusers.update({
-            aedBattery: req.body.IsAedBatteryChecked,
-            twistedSystem: req.body.IsTwistedSystemChecked,
-            infustion: req.body.IsInfusionChecked,
-            incertion: req.body.IsIncertionChecked,
+            IsUserGuideChecked: req.body.IsUserGuideChecked,
+            IsInsulinPumpWithCoverChecked: req.body.IsInsulinPumpWithCoverChecked,
+            IsUsebCableChecked: req.body.IsUsebCableChecked,
+            IsWalladapterChecked: req.body.IsWalladapterChecked,
+            IsPumpchargerChecked: req.body.IsPumpchargerChecked,
+            IsRechargableBatteryChecked: req.body.IsRechargableBatteryChecked,
+            IsPumpclipChecked: req.body.IsPumpclipChecked,
             step: req.body.step
         }, {
             where: {
@@ -154,8 +157,6 @@ app.post('/get-stepdata', async (req, res) => {
     });
 return res.json({user});
 })
-
-
 
 function authenticate(req, res, next) {
     const authHeader = req.headers['authorization'];
